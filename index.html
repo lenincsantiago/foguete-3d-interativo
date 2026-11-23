@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Vetor-2: foguete 3D interativo</title>
+  <meta name="description" content="Gire, aproxime e lance o Vetor-2, um foguete de dois estágios em 3D. Veja a separação dos estágios e o pouso do primeiro estágio.">
+  <meta name="theme-color" content="#172636">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lenincsantiago.github.io/foguete-3d-interativo/">
+  <link rel="canonical" href="https://lenincsantiago.github.io/foguete-3d-interativo/">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="Vetor-2: foguete 3D interativo">
+  <meta property="og:description" content="Gire, aproxime e lance um foguete de dois estágios. Veja a separação e o pouso do primeiro estágio.">
+  <meta property="og:image" content="https://lenincsantiago.github.io/foguete-3d-interativo/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Foguete Vetor-2 na plataforma de lançamento ao amanhecer, com a torre de serviço ao lado">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/estilo.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/",
+      "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.15.1/index.js"
+    },
+    "integrity": {
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/FXAAPass.js": "sha384-CrJQKsgMW3KYQLZSb2ePYOt/LHDsTg0ozmjIrNjXm0t5UeTiTw9ceyrvpdbSR4gb",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/shaders/FXAAShader.js": "sha384-6cc/cezSIrcisjAF9qPbr5UZUum+Ydjxv40YtryKSy8PvjvtJ6eW+k4Af6iOe5Nw",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js": "sha384-T/E3B9AvPtLn5PKD7aTSFqizQcA4kHDfU0lub7u0fvM4w9BMGcSb3yI7r5LqMAMn",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.core.js": "sha384-drH6BueSlcvoXCwAqWkNJvXwu2Ax3mnGOmZnIXaomedIw+uXSP9Bf/XIUINgLUW+",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/utils/BufferGeometryUtils.js": "sha384-NArny884Zj3HwjLRjeY1kbfLZnAHIElzho3N71FW0eMGxxBT+QuLEiSnSgpSaBXh",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/controls/OrbitControls.js": "sha384-ZVBN/wmVxgX0mUGjFJXakzzdZrAF4g4aHfKyusbjoF0WsVXSoGpeM/qRaVnXtaFo",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/environments/RoomEnvironment.js": "sha384-/H49oz0ZtMgJNgMZ+OhhuMuKBOsaiC3kY0/PZSvgJJXAOJJwmSBJjzlV5lJul3MB",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/EffectComposer.js": "sha384-9Rdp95mYHRj8gGxPz4TqkDaCUh8rd67b7V5slkjz7GA9uNXtykhptQdEPPOocbUn",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/RenderPass.js": "sha384-uXlYrFHzQTAiW5xsJFs0kB/Pym7jA0qunZ+aS1V25CJ1MjaKbgNQv5SjoEzNoa4F",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/UnrealBloomPass.js": "sha384-J699EvlO1FVuoaUhw+StnAgeSEEK6d2YjxWcmFt5WIQznsMXDgyfAY5Q4F7fhSgn",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/ShaderPass.js": "sha384-0DjIyth2/18aCmCo4x7GEOqSJTu3uNx5ptRg+rlkZ7zs9MlNfUXVEhbUuzVzglaG",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/OutputPass.js": "sha384-3IFYrRLOw90S3gt5Xi3JVTJrETpklthjLSmnmeyqxQmh1knUIaGPwbRsk35kgNoW",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/MaskPass.js": "sha384-5MFlCMNYgjI2KQDXH12DjwyKtWiXRsrFMMGKIP3pCQemWtt1INLwPKwZDF0TEKG9",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/postprocessing/Pass.js": "sha384-927X5fcqlqKPsXZV1w3tv5BZx797OXX3D/TDJk0FHwJd12z58B5aqS77g5LZoprI",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/shaders/CopyShader.js": "sha384-Hxod3deUgRexb42wOr+7J8ySu/QNr1oXlCfY9bivrSKBseng+R34eirHq/Rvvxee",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/shaders/LuminosityHighPassShader.js": "sha384-pJrfb1+CmauCtIjocA5YIJaosvBlTpTYBJLn6km9pktlMGoyTXhviuXjgzV2jcns",
+      "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/shaders/OutputShader.js": "sha384-7B5u2okAR4bArb4emcYnTiZPFpV3wPNvV3ZY9xre0xp3cNKs2TeaYiOyMDa/bDAi",
+      "https://cdn.jsdelivr.net/npm/gsap@3.15.1/index.js": "sha384-CXonANN5Q5Pae0kOCXGnbY2891Skh1oEA3KdyFrgl5A+9HbgTfL39dJzkIbDN/y8",
+      "https://cdn.jsdelivr.net/npm/gsap@3.15.1/gsap-core.js": "sha384-zKJLHelmTwLSyuHVv4cVIKQKQ2kwXtFqcU74cIJKvWlaWu1orVXPmdEj1SpTJQHD",
+      "https://cdn.jsdelivr.net/npm/gsap@3.15.1/CSSPlugin.js": "sha384-fa9m1CsgqmLLh5/HF6xJ/YBgMKhTRUC/Yna3V2+yZb8ZKCqchA+P2/OP6ZZZ896J"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="cena" tabindex="0" role="application" aria-roledescription="cena 3D" aria-label="Foguete Vetor-2 na plataforma de lançamento" aria-describedby="ajuda-teclado"></canvas>
+  <p class="status" id="ajuda-teclado">Com a cena em foco: setas giram a câmera, mais e menos aproximam, L lança ou pausa, R reinicia, Esc fecha o painel.</p>
+  <div class="marcador" id="marcador" aria-hidden="true"></div>
+
+  <header class="marca">
+    <h1 translate="no">Vetor-2</h1>
+    <p>Foguete de dois estágios. O primeiro volta e pousa.</p>
+  </header>
+
+  <div class="contagem" id="contagem" aria-hidden="true"></div>
+
+  <main class="ui">
+    <aside class="painel" id="painel" aria-labelledby="painel-titulo" hidden>
+      <button class="painel-fechar" id="painel-fechar" type="button" aria-label="Fechar informações da peça">×</button>
+      <h2 id="painel-titulo"></h2>
+      <p id="painel-texto"></p>
+      <p class="painel-grupo" id="painel-grupo"></p>
+    </aside>
+
+    <div class="lista-pecas" id="lista-pecas" hidden>
+      <h2 id="lista-titulo">Peças do Vetor-2</h2>
+      <ul id="lista-pecas-itens" aria-labelledby="lista-titulo"></ul>
+    </div>
+
+    <section class="comando" aria-label="Controle do voo">
+      <ol class="fases" id="fases">
+        <li data-fase="contagem">Contagem</li>
+        <li data-fase="ignicao">Ignição</li>
+        <li data-fase="decolagem">Decolagem</li>
+        <li data-fase="meco">Corte</li>
+        <li data-fase="separacao">Separação</li>
+        <li data-fase="pouso">Pouso</li>
+      </ol>
+      <dl class="telemetria" id="telemetria">
+        <div><dt>Altitude</dt><dd id="altitude">0,0 km</dd></div>
+        <div><dt>Velocidade</dt><dd id="velocidade">0 km/h</dd></div>
+      </dl>
+      <div class="acoes">
+        <button class="btn-secundario" id="btn-pecas" type="button" aria-expanded="false" aria-controls="lista-pecas">Peças</button>
+        <button class="btn-secundario" id="reiniciar" type="button" hidden>Reiniciar</button>
+        <button class="btn-lancar" id="lancar" type="button" disabled>Carregando…</button>
+      </div>
+    </section>
+  </main>
+
+  <p class="dica" id="dica">Arraste para girar. Use a roda do mouse ou a pinça para aproximar. Toque numa peça para saber o que ela faz.</p>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <div class="aviso" id="aviso" role="alert" hidden></div>
+  <noscript><div class="aviso">Este foguete 3D precisa de JavaScript. Ative o JavaScript no navegador e recarregue a página.</div></noscript>
+
+  <script type="module">
+    // Carrega a cena; se o 3D não abrir (sem WebGL ou sem internet para o three.js), mostra o motivo
+    import('./js/main.js').catch((erro) => {
+      console.error(erro);
+      const aviso = document.getElementById('aviso');
+      aviso.textContent = erro?.message === 'sem-webgl'
+        ? 'Seu navegador não conseguiu abrir gráficos 3D (WebGL). Tente outro navegador ou ative a aceleração de hardware.'
+        : 'Não foi possível carregar o 3D. Verifique a conexão com a internet e recarregue a página.';
+      aviso.hidden = false;
+      document.getElementById('lancar').textContent = 'Indisponível';
+    });
+  </script>
+</body>
+</html>

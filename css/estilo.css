@@ -1,0 +1,285 @@
+/* Tokens da direção aprovada (Etapa 1) */
+:root {
+  --ceu: #1e3a5f;
+  --painel: #172636;
+  --trilho: #3a4b5e;
+  --trilho-forte: #4a5d72;
+  --tinta: #eef0ec;
+  --tinta-2: #c9d2dc;
+  --tinta-3: #a9b6c4;
+  --chama: #ff6b1a;
+  --chama-forte: #ff8440;
+  --sobre-chama: #1a0e05;
+
+  --fonte: 'Barlow', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --fonte-num: 'Barlow Semi Condensed', 'Barlow', 'Arial Narrow', sans-serif;
+
+  --e1: 4px; --e2: 8px; --e3: 12px; --e4: 16px; --e5: 24px; --e6: 32px;
+  --raio: 8px;
+  --rapido: 160ms;
+  --normal: 240ms;
+  --sai: cubic-bezier(0.16, 1, 0.3, 1);
+  --margem: max(var(--e4), env(safe-area-inset-left));
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ceu);
+  color: var(--tinta);
+  font-family: var(--fonte);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none; /* sem puxar-para-atualizar sobre a cena */
+}
+
+::selection { background: var(--chama); color: var(--sobre-chama); }
+
+#cena {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  display: block;
+  touch-action: none; /* o OrbitControls trata arrastar e pinça; a página não rola nem dá zoom */
+  outline: none;
+}
+/* contorno para dentro: box-shadow inset fica por baixo do desenho do canvas e não aparece */
+#cena:focus-visible { outline: 3px solid var(--chama); outline-offset: -3px; }
+
+/* Interface fica por cima do canvas, sem bloquear o arrasto fora dos painéis */
+.marca, .ui, .dica, .contagem { position: fixed; pointer-events: none; user-select: none; -webkit-user-select: none; }
+.painel, .comando { pointer-events: auto; }
+
+.marca { top: max(var(--e5), env(safe-area-inset-top)); left: var(--margem); max-width: 22rem; }
+.marca h1 {
+  margin: 0;
+  text-wrap: balance;
+  font-family: var(--fonte-num);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.marca p { margin: var(--e2) 0 0; color: var(--tinta-2); font-size: 1rem; }
+
+/* Contagem na coluna da esquerda, sob o título: o foguete fica sempre no centro do quadro,
+   então centralizada ela caía em cima do corpo branco e perdia contraste */
+.contagem {
+  top: calc(max(var(--e5), env(safe-area-inset-top)) + clamp(4.5rem, 3.2rem + 3vw, 6.5rem));
+  left: var(--margem);
+  font-family: var(--fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: clamp(3.5rem, 2rem + 6vw, 7rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity var(--normal) var(--sai), transform var(--normal) var(--sai);
+  /* véu escuro sob os números: segurança extra se a câmera for girada para trás do texto */
+  text-shadow: 0 2px 24px rgba(11, 22, 38, 0.8), 0 0 3px rgba(11, 22, 38, 0.7);
+}
+.contagem.visivel { opacity: 1; transform: none; }
+
+.ui { inset: 0; }
+
+.painel {
+  position: absolute;
+  top: max(var(--e5), env(safe-area-inset-top));
+  right: max(var(--e4), env(safe-area-inset-right));
+  width: min(22rem, calc(100vw - 2 * var(--e4)));
+  background: var(--painel);
+  border-radius: var(--raio);
+  padding: var(--e4) var(--e5) var(--e5);
+  transition: opacity var(--normal) var(--sai), transform var(--normal) var(--sai);
+}
+.painel[hidden] { display: block; opacity: 0; transform: translateX(16px); pointer-events: none; visibility: hidden; }
+.painel h2 { margin: 0 var(--e6) 0 0; font-size: 1.25rem; font-weight: 600; line-height: 1.25; }
+.painel p { margin: var(--e2) 0 0; color: var(--tinta-2); }
+.painel .painel-grupo { color: var(--tinta-3); font-size: 0.875rem; margin-top: var(--e3); }
+.painel-fechar {
+  position: absolute; top: var(--e2); right: var(--e2);
+  width: 44px; height: 44px;
+  border: 0; border-radius: 999px;
+  background: transparent; color: var(--tinta-2);
+  font: 500 1.5rem/1 var(--fonte);
+  cursor: pointer;
+  transition: background-color var(--rapido) var(--sai), color var(--rapido) var(--sai);
+}
+.painel-fechar:active { background: var(--trilho); }
+
+.comando {
+  position: absolute;
+  left: var(--margem);
+  right: max(var(--e4), env(safe-area-inset-right));
+  bottom: max(var(--e4), env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
+  background: var(--painel);
+  border-radius: var(--raio);
+  padding: var(--e3) var(--e4);
+}
+
+.fases { display: flex; gap: var(--e1); list-style: none; margin: 0; padding: 0; flex: 1; min-width: 0; }
+.fases li { flex: 1; min-width: 0; font-size: 0.875rem; color: var(--tinta-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fases li::before {
+  content: ''; display: block; height: 4px; margin-bottom: 6px;
+  border-radius: 2px; background: var(--trilho);
+  transition: background-color var(--normal) var(--sai);
+}
+.fases li.feita, .fases li.atual { color: var(--tinta); }
+.fases li.feita::before, .fases li.atual::before { background: var(--chama); }
+
+.telemetria { display: flex; gap: var(--e4); margin: 0; font-family: var(--fonte-num); font-variant-numeric: tabular-nums; }
+.telemetria div { min-width: 5.5rem; }
+.telemetria dt { font-size: 0.8125rem; color: var(--tinta-3); }
+.telemetria dd { margin: 0; font-size: 1.125rem; font-weight: 600; }
+
+.acoes { display: flex; gap: var(--e2); }
+
+button { font-family: var(--fonte); }
+.btn-lancar, .btn-secundario {
+  min-height: 48px;
+  padding: 0 var(--e5);
+  border: 0;
+  border-radius: 999px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--rapido) var(--sai), transform var(--rapido) var(--sai);
+}
+.btn-lancar { background: var(--chama); color: var(--sobre-chama); min-width: 8.5rem; }
+.btn-secundario { background: var(--trilho); color: var(--tinta); }
+.btn-lancar, .btn-secundario, .painel-fechar { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+
+/* Hover só onde existe mouse de verdade (no toque ele "gruda") */
+@media (hover: hover) and (pointer: fine) {
+  .btn-lancar:hover { background: var(--chama-forte); }
+  .btn-secundario:hover { background: var(--trilho-forte); }
+  .painel-fechar:hover { background: var(--trilho); color: var(--tinta); }
+}
+.btn-lancar:active, .btn-secundario:active { transform: scale(0.97); }
+.btn-lancar:disabled { background: var(--trilho); color: var(--tinta-3); cursor: not-allowed; transform: none; }
+
+:is(button, [tabindex]):focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+
+.dica {
+  left: 50%;
+  bottom: calc(max(var(--e4), env(safe-area-inset-bottom)) + 92px);
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: min(36rem, calc(100vw - 2 * var(--e4)));
+  padding: var(--e2) var(--e4);
+  background: var(--painel);
+  border-radius: var(--raio);
+  color: var(--tinta-2);
+  font-size: 0.9375rem;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity var(--normal) var(--sai);
+}
+.dica.sumiu { opacity: 0; }
+
+/* Marcador: anel que acompanha o ponto clicado na peça (posição só por transform, vinda do JS) */
+.marcador {
+  position: fixed;
+  top: -11px; left: -11px;
+  width: 22px; height: 22px;
+  border: 3px solid var(--chama);
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(23, 38, 54, 0.75);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--rapido) var(--sai);
+}
+.marcador.visivel { visibility: visible; opacity: 1; }
+
+/* Lista de peças: abre acima da barra de comando */
+.lista-pecas {
+  position: absolute;
+  right: max(var(--e4), env(safe-area-inset-right));
+  bottom: calc(max(var(--e4), env(safe-area-inset-bottom)) + 88px);
+  width: min(20rem, calc(100vw - 2 * var(--e4)));
+  max-height: min(60vh, 34rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--painel);
+  border-radius: var(--raio);
+  padding: var(--e4) var(--e3) var(--e3);
+  pointer-events: auto;
+  transition: opacity var(--rapido) var(--sai), transform var(--rapido) var(--sai);
+}
+.lista-pecas[hidden] { display: block; opacity: 0; transform: translateY(8px); visibility: hidden; pointer-events: none; }
+.lista-pecas h2 { margin: 0 var(--e2) var(--e2); font-size: 1rem; font-weight: 600; }
+.lista-pecas ul { list-style: none; margin: 0; padding: 0; }
+.lista-pecas button {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--e3);
+  width: 100%; min-height: 44px;
+  padding: var(--e2) var(--e2);
+  border: 0; border-radius: 6px;
+  background: transparent; color: var(--tinta);
+  font-size: 1rem; text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--rapido) var(--sai);
+}
+.lista-pecas .lp-grupo { color: var(--tinta-3); font-size: 0.8125rem; white-space: nowrap; }
+.lista-pecas button:active { background: var(--trilho); }
+
+@media (hover: hover) and (pointer: fine) {
+  .lista-pecas button:hover { background: var(--trilho); }
+}
+
+.aviso {
+  position: fixed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(28rem, calc(100vw - 2 * var(--e4)));
+  padding: var(--e5);
+  background: var(--painel);
+  border-radius: var(--raio);
+  color: var(--tinta);
+  font-size: 1.0625rem;
+}
+
+.status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Telas médias: as fases ganham uma linha inteira; telemetria e botões vão para a linha de baixo */
+@media (max-width: 1100px) {
+  .comando { flex-wrap: wrap; row-gap: var(--e3); }
+  .fases { flex-basis: 100%; }
+  .telemetria { flex: 1; }
+  .lista-pecas { bottom: calc(max(var(--e4), env(safe-area-inset-bottom)) + 140px); }
+  .dica { bottom: calc(max(var(--e4), env(safe-area-inset-bottom)) + 136px); } /* a barra quebrou em duas linhas */
+}
+
+/* Celular: a barra vira gaveta com a fase atual e o botão ao alcance do polegar */
+@media (max-width: 700px) {
+  .marca p { display: none; }
+  .comando { left: 0; right: 0; bottom: 0; border-radius: 14px 14px 0 0; gap: var(--e3);
+    padding: var(--e3) var(--e4) max(var(--e4), env(safe-area-inset-bottom)); }
+  .fases li { font-size: 0; }
+  .fases li.atual { font-size: 0.875rem; }
+  .fases li::before { margin-bottom: 0; }
+  .fases li.atual::before { margin-bottom: 6px; }
+  .acoes { flex: 1; justify-content: flex-end; }
+  .btn-lancar { flex: 1; max-width: 14rem; }
+  .painel { top: auto; right: 0; left: 0; bottom: 0; width: 100%; border-radius: 14px 14px 0 0;
+    padding-bottom: max(var(--e5), env(safe-area-inset-bottom)); z-index: 2; }
+  .painel[hidden] { transform: translateY(24px); }
+  .dica { bottom: calc(max(var(--e4), env(safe-area-inset-bottom)) + 156px); font-size: 0.875rem; }
+  .lista-pecas { right: var(--e2); left: var(--e2); width: auto; bottom: 132px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 1ms !important; }
+}
